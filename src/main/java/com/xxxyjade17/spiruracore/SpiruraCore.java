@@ -37,6 +37,7 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 public class SpiruraCore {
     public static final String MODID = "spiruracore";
     private static final Logger LOGGER = LogUtils.getLogger();
+    private static final Config config = Config.getINSTANCE();
 
     public SpiruraCore(IEventBus modEventBus) {
 

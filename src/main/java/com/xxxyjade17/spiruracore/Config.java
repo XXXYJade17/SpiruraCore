@@ -20,10 +20,13 @@ public class Config {
     private static JsonObject config;
 
     private static Map<Integer,String> RankNameMap =new HashMap<>();
-    private static Map<Integer,Map<Integer,Integer>> ExperienceMap =new HashMap<>();
+    private static Map<Integer,Map<Integer,Integer>> RequiredExperienceMap =new HashMap<>();
+    private static Map<Integer,Map<Integer,Integer>> IncreasedExperienceMap =new HashMap<>();
     private static Map<Integer,Map<Integer,Boolean>> ShackleMap = new HashMap<>();
     private static Map<Integer,Map<Integer,Float>> BreakRateMap = new HashMap<>();
     private static Map<Integer,Map<Integer,Float>> RateIncreaseMap = new HashMap<>();
+
+    private static int ticks_per_increase;
 
     private Config() {
         try {
@@ -58,6 +61,8 @@ public class Config {
         }
         Reader reader = Files.newBufferedReader(path, StandardCharsets.UTF_8);
         config = gson.fromJson(reader, JsonObject.class);
+
+        ticks_per_increase = config.get("ticks_per_increase").getAsInt();
     }
 
     private void loadRankName() throws IOException {
@@ -101,18 +106,26 @@ public class Config {
             }
         }
         Reader reader = Files.newBufferedReader(path, StandardCharsets.UTF_8);
-        JsonObject rank = gson.fromJson(reader, JsonObject.class);
-        Map<Integer,Map<Integer,Integer>> experienceMap=new HashMap<>();
-        for (int i = 1; i <= rank.size(); i++) {
-            JsonObject level = rank.get("rank"+ i).getAsJsonObject();
-            Map<Integer,Integer> levelExperience = new HashMap<>();
-            for (int j = 1; j <= level.size(); j++) {
-                int exp = level.get("level"+ j).getAsInt();
-                levelExperience.put(j,exp);
+
+        JsonObject experience = gson.fromJson(reader, JsonObject.class);
+        Map<Integer,Map<Integer,Integer>> requiredExperienceMap=new HashMap<>();
+        Map<Integer,Map<Integer,Integer>> increasedExperienceMap=new HashMap<>();
+        for (int i = 1; i <= experience.size(); i++) {
+            JsonObject rank = experience.get("rank"+ i).getAsJsonObject();
+            Map<Integer,Integer> requiredExperience = new HashMap<>();
+            Map<Integer,Integer> increasedExperience = new HashMap<>();
+            for (int j = 1; j <= rank.size(); j++) {
+                JsonObject level = rank.get("level"+ j).getAsJsonObject();
+                int require = level.get("require").getAsInt();
+                int increase = level.get("increase").getAsInt();
+                requiredExperience.put(j,require);
+                increasedExperience.put(j,increase);
             }
-            experienceMap.put(i,levelExperience);
+            requiredExperienceMap.put(i,requiredExperience);
+            IncreasedExperienceMap.put(i,increasedExperience);
         }
-        ExperienceMap=experienceMap;
+        RequiredExperienceMap=requiredExperienceMap;
+        IncreasedExperienceMap =increasedExperienceMap;
     }
 
     private void loadShackle() throws IOException {
@@ -162,8 +175,12 @@ public class Config {
         return RankNameMap.get(rank);
     }
 
-    public int getExperience(int rank,int level){
-        return ExperienceMap.get(rank).get(level);
+    public int getRequiredExperience(int rank,int level){
+        return RequiredExperienceMap.get(rank).get(level);
+    }
+
+    public int getIncreasedExperience(int rank,int level){
+        return IncreasedExperienceMap.get(rank).get(level);
     }
 
     public boolean getShackle(int rank,int level){
@@ -191,4 +208,10 @@ public class Config {
         return String.format(getLogMessage(key),args);
     }
 
+    public Object getConfigInfo(String key){
+        return switch (key) {
+            case "ticks_per_increase" -> ticks_per_increase;
+            default -> key;
+        };
+    }
 }
