@@ -10,8 +10,8 @@ public class ClientPayloadHandler {
     private int level;
     private int experience;
     private boolean shackle;
-    private int breakRate;
-    private int rateIncrease;
+    private float breakRate;
+    private float rateIncrease;
 
 
     public static ClientPayloadHandler getINSTANCE() {

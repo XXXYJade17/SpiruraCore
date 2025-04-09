@@ -14,10 +14,10 @@ public interface ISpirura {
     void breakShackle();
     void setShackle(boolean shackle);
     boolean hasShackle();
-    int getBreakRate();
-    void setBreakRate(int breakRate);
-    int getRateIncrease();
-    void setRateIncrease(int rateIncrease);
+    float getBreakRate();
+    void setBreakRate(float breakRate);
+    float getRateIncrease();
+    void setRateIncrease(float rateIncrease);
 
     void saveData(CompoundTag nbt);
     void loadData(CompoundTag nbt);

@@ -6,11 +6,11 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 
-public record SpiruraData(int rank, int level, int experience, boolean shackle, int breakRate, int rateIncrease) implements CustomPacketPayload {
+public record SpiruraData(int rank, int level, int experience, boolean shackle, float breakRate, float rateIncrease) implements CustomPacketPayload {
     public static final ResourceLocation ID = new ResourceLocation(SpiruraCore.MODID, "spirura_data");
 
     public SpiruraData(FriendlyByteBuf buf){
-        this(buf.readInt(), buf.readInt(),buf.readInt(),buf.readBoolean(),buf.readInt(),buf.readInt());
+        this(buf.readInt(), buf.readInt(),buf.readInt(),buf.readBoolean(),buf.readFloat(),buf.readFloat());
     }
 
     @Override
@@ -19,8 +19,8 @@ public record SpiruraData(int rank, int level, int experience, boolean shackle, 
         buf.writeInt(level);
         buf.writeInt(experience);
         buf.writeBoolean(shackle);
-        buf.writeInt(breakRate);
-        buf.writeInt(rateIncrease);
+        buf.writeFloat(breakRate);
+        buf.writeFloat(rateIncrease);
     }
 
     @Override

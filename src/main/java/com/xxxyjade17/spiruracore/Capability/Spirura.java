@@ -7,8 +7,8 @@ public class Spirura implements ISpirura{
     private int level;
     private int experience;
     private boolean shackle;
-    private int breakRate;
-    private int rateIncrease;
+    private float breakRate;
+    private float rateIncrease;
 
     @Override
     public int getRank() {
@@ -61,22 +61,22 @@ public class Spirura implements ISpirura{
     }
 
     @Override
-    public int getBreakRate() {
+    public float getBreakRate() {
         return breakRate;
     }
 
     @Override
-    public void setBreakRate(int breakRate) {
+    public void setBreakRate(float breakRate) {
         this.breakRate=breakRate;
     }
 
     @Override
-    public int getRateIncrease() {
+    public float getRateIncrease() {
         return rateIncrease;
     }
 
     @Override
-    public void setRateIncrease(int rateIncrease) {
+    public void setRateIncrease(float rateIncrease) {
         this.rateIncrease=rateIncrease;
     }
 
@@ -86,8 +86,8 @@ public class Spirura implements ISpirura{
         nbt.putInt("level", level);
         nbt.putInt("experience", experience);
         nbt.putBoolean("shackle", shackle);
-        nbt.putInt("breakRate", breakRate);
-        nbt.putInt("rateIncrease", rateIncrease);
+        nbt.putFloat("breakRate", breakRate);
+        nbt.putFloat("rateIncrease", rateIncrease);
     }
 
     @Override
@@ -96,7 +96,7 @@ public class Spirura implements ISpirura{
         level = nbt.getInt("level");
         experience = nbt.getInt("experience");
         shackle = nbt.getBoolean("shackle");
-        breakRate = nbt.getInt("breakRate");
-        rateIncrease = nbt.getInt("rateIncrease");
+        breakRate = nbt.getFloat("breakRate");
+        rateIncrease = nbt.getFloat("rateIncrease");
     }
 }

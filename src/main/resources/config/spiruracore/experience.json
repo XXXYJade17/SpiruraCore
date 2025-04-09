@@ -1,0 +1,26 @@
+{
+  "rank1":{
+    "level1": 100,
+    "level2": 200,
+    "level3": 300,
+    "level4": 400,
+    "level5": 500,
+    "level6": 600,
+    "level7": 700,
+    "level8": 800,
+    "level9": 900,
+    "level10": 1000
+  },
+  "rank2":{
+    "level1": 1100,
+    "level2": 1200,
+    "level3": 1300,
+    "level4": 1400,
+    "level5": 1500,
+    "level6": 1600,
+    "level7": 1700,
+    "level8": 1800,
+    "level9": 1900,
+    "level10": 2000
+  }
+}
