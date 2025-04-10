@@ -128,6 +128,7 @@ public class Config {
                 requiredExperience.put(j,require);
                 increasedExperience.put(j,increase);
             }
+
             requiredExperienceMap.put(i,requiredExperience);
             IncreasedExperienceMap.put(i,increasedExperience);
         }
