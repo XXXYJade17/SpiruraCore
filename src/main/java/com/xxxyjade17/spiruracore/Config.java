@@ -2,10 +2,13 @@ package com.xxxyjade17.spiruracore;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import com.google.gson.reflect.TypeToken;
+import net.minecraft.network.chat.Component;
 import org.slf4j.Logger;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -19,6 +22,7 @@ public class Config {
     private static final Gson gson = new Gson();
     private static JsonObject config;
 
+    private static Map<String, String> translations = new HashMap<>();
     private static Map<Integer,String> RankNameMap =new HashMap<>();
     private static Map<Integer,Map<Integer,Integer>> RequiredExperienceMap =new HashMap<>();
     private static Map<Integer,Map<Integer,Integer>> IncreasedExperienceMap =new HashMap<>();
@@ -27,10 +31,12 @@ public class Config {
     private static Map<Integer,Map<Integer,Float>> RateIncreaseMap = new HashMap<>();
 
     private static int ticks_per_increase;
+    private static String lang;
 
     private Config() {
         try {
             loadConfig();
+            loadTranslation();
             loadRankName();
             loadExperience();
             loadShackle();
@@ -63,6 +69,7 @@ public class Config {
         config = gson.fromJson(reader, JsonObject.class);
 
         ticks_per_increase = config.get("ticks_per_increase").getAsInt();
+        lang = config.get("language").getAsString();
     }
 
     private void loadRankName() throws IOException {
@@ -156,11 +163,13 @@ public class Config {
             for (int j = 1; j <= rank.size(); j++) {
                 JsonObject level = rank.get("level"+ j).getAsJsonObject();
                 boolean Shackle=level.get("shackle").getAsBoolean();
-                float BreakRate=level.get("break_rate").getAsFloat();
-                float RateIncrease=level.get("rate_increase").getAsFloat();
+                if(Shackle){
+                    float BreakRate=level.get("break_rate").getAsFloat();
+                    float RateIncrease=level.get("rate_increase").getAsFloat();
+                    breakRate.put(j,BreakRate);
+                    rateIncrease.put(j,RateIncrease);
+                }
                 shackle.put(j,Shackle);
-                breakRate.put(j,BreakRate);
-                rateIncrease.put(j,RateIncrease);
             }
             shackleMap.put(i,shackle);
             breakRateMap.put(i,breakRate);
@@ -171,8 +180,62 @@ public class Config {
         RateIncreaseMap=rateIncreaseMap;
     }
 
+    private void loadTranslation() throws IOException{
+        Path langDir = Path.of("config/spiruracore/lang");
+        Files.createDirectories(langDir);
+
+        loadLanguage(langDir,"en_us.json");
+        loadLanguage(langDir,"zh_cn.json");
+
+        String fileName = getConfigInfo("lang")+".json";
+        Path langPath = langDir.resolve(fileName);
+        if(Files.exists(langPath)){
+            Reader reader = Files.newBufferedReader(langPath, StandardCharsets.UTF_8);
+            translations = new Gson().fromJson(reader, new TypeToken<Map<String, String>>(){}.getType());
+        } else{
+            loadDefaultLanguage();
+            LOGGER.warn(getLogMessage("language.default"));
+        }
+    }
+
+    private void loadLanguage(Path langDir, String fileName) throws IOException {
+        Path path=langDir.resolve(fileName);
+        if (Files.notExists(path)) {
+            InputStream inputStream = Config.class.getResourceAsStream("/assets/spiruracore/lang/"+fileName);
+            if (inputStream != null) {
+                Files.copy(inputStream, path);
+            }else{
+                LOGGER.warn(getLogMessage("file.empty",fileName));
+            }
+        }
+    }
+
+    private void loadDefaultLanguage(){
+        InputStream inputStream = Config.class.getResourceAsStream("/assets/spiruracore/lang/en_us.json");
+        if (inputStream != null) {
+            InputStreamReader reader = new InputStreamReader(inputStream, StandardCharsets.UTF_8);
+            translations = new Gson().fromJson(reader, new TypeToken<Map<String, String>>(){}.getType());
+        }
+    }
+
     public String getRankName(int rank){
         return RankNameMap.get(rank);
+    }
+
+    public String getLevelName(int level){
+        return switch (level){
+            case 1 -> "第一重";
+            case 2 -> "第二重";
+            case 3 -> "第三重";
+            case 4 -> "第四重";
+            case 5 -> "第五重";
+            case 6 -> "第六重";
+            case 7 -> "第七重";
+            case 8 -> "第八重";
+            case 9 -> "第九重";
+            case 10 -> "圆满";
+            default -> "未知";
+        };
     }
 
     public int getRequiredExperience(int rank,int level){
@@ -200,6 +263,7 @@ public class Config {
             case "config.failed" -> "AttributeCore配置文件加载失败:";
             case "file.empty" -> "{}文件为空！";
             case "file.failed" -> "{}文件加载失败:";
+            case "language.default" -> "加载默认语言文件!";
             default -> key;
         };
     }
@@ -211,7 +275,18 @@ public class Config {
     public Object getConfigInfo(String key){
         return switch (key) {
             case "ticks_per_increase" -> ticks_per_increase;
+            case "lang" -> lang;
             default -> key;
         };
+    }
+
+    public static Component getMessage(String key) {
+        String text = translations.getOrDefault(key, key);
+        return Component.literal(text);
+    }
+
+    public static Component getMessage(String key, Object... args) {
+        String text = translations.getOrDefault(key, key);
+        return Component.literal(String.format(text, args));
     }
 }

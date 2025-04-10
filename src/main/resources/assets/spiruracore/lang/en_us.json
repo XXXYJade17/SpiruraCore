@@ -1,5 +1,4 @@
 {
-  "itemGroup.spiruracore": "Example Mod Tab",
-  "block.spiruracore.example_block": "Example Block",
-  "item.spiruracore.example_item": "Example Item"
+  "spirura.online.reward": "Spirura Online Reward +%d",
+  "spirura.player.get" : "%s %s %d"
 }

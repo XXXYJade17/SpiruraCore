@@ -1,5 +1,6 @@
 package com.xxxyjade17.spiruracore;
 
+import com.xxxyjade17.spiruracore.Command.PlayerCommand;
 import org.slf4j.Logger;
 
 import com.mojang.logging.LogUtils;
@@ -40,10 +41,16 @@ public class SpiruraCore {
     private static final Config config = Config.getINSTANCE();
 
     public SpiruraCore(IEventBus modEventBus) {
-
+        NeoForge.EVENT_BUS.addListener((ServerStartingEvent event) ->
+                PlayerCommand.getINSTANCE().registerCommand(event.getServer().getCommands().getDispatcher())
+        );
     }
 
     public static Logger getLogger() {
         return LOGGER;
+    }
+
+    public static Config getConfig() {
+        return config;
     }
 }

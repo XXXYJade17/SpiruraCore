@@ -36,7 +36,8 @@ public class PlayerTick {
                         ticks++;
                         if(ticks>=TICKS_PER_INCREASE){
                             if(!spirura.hasShackle()){
-                                spirura.addExperience(Config.getINSTANCE().getIncreasedExperience(rank,level));
+                                int increasedExperience= SpiruraCore.getConfig().getIncreasedExperience(rank,level);
+                                spirura.addExperience(increasedExperience);
                                 PacketDistributor.PLAYER.with(player)
                                         .send(new SpiruraData(
                                                 spirura.getRank(),
@@ -45,6 +46,7 @@ public class PlayerTick {
                                                 spirura.hasShackle(),
                                                 spirura.getBreakRate(),
                                                 spirura.getRateIncrease()));
+                                player.sendSystemMessage(Config.getMessage("spirura.online.increase",increasedExperience));
                             }
                             counters.put(player,0);
                         }else{

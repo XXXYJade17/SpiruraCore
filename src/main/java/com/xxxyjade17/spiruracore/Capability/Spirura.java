@@ -6,12 +6,12 @@ import net.minecraft.nbt.CompoundTag;
 import java.security.SecureRandom;
 
 public class Spirura implements ISpirura{
-    private int rank;
-    private int level;
-    private int experience;
+    private int rank=1;
+    private int level=1;
+    private int experience=0;
     private boolean shackle=false;
-    private float breakRate;
-    private float rateIncrease;
+    private float breakRate=0;
+    private float rateIncrease=0;
 
     @Override
     public int getRank() {
@@ -69,8 +69,8 @@ public class Spirura implements ISpirura{
         float randomValue = secureRandom.nextFloat();
         if(randomValue<=this.breakRate){
             this.shackle=false;
-            this.breakRate = Config.getINSTANCE().getBreakRate(rank, level);
-            this.rateIncrease = Config.getINSTANCE().getRateIncrease(rank, level);
+            this.breakRate = 0;
+            this.rateIncrease = 0;
 
             if(level==10){
                 rank++;
