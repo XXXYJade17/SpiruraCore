@@ -2,6 +2,7 @@ package com.xxxyjade17.spiruracore.Event;
 
 import com.xxxyjade17.spiruracore.Capability.Spirura;
 import com.xxxyjade17.spiruracore.Config;
+import com.xxxyjade17.spiruracore.Data.Client.SpiruraData;
 import com.xxxyjade17.spiruracore.Handler.CapabilityHandler;
 import com.xxxyjade17.spiruracore.SpiruraCore;
 import net.minecraft.server.level.ServerPlayer;
@@ -28,36 +29,29 @@ public class PlayerTick {
                 Optional<Spirura> optionalSpirura=
                         Optional.ofNullable(player.getCapability(CapabilityHandler.SPIRURA_HANDLER));
                 optionalSpirura.ifPresent(spirura -> {
+                    int rank = spirura.getRank();
+                    int level = spirura.getLevel();
                    if(!spirura.hasShackle()){
-
+                        int ticks=counters.getOrDefault(player,0);
+                        ticks++;
+                        if(ticks>=TICKS_PER_INCREASE){
+                            if(!spirura.hasShackle()){
+                                spirura.addExperience(Config.getINSTANCE().getIncreasedExperience(rank,level));
+                                PacketDistributor.PLAYER.with(player)
+                                        .send(new SpiruraData(
+                                                spirura.getRank(),
+                                                spirura.getLevel(),
+                                                spirura.getExperience(),
+                                                spirura.hasShackle(),
+                                                spirura.getBreakRate(),
+                                                spirura.getRateIncrease()));
+                            }
+                            counters.put(player,0);
+                        }else{
+                            counters.put(player,ticks);
+                        }
                    }
                 });
-//                Optional<Shackle> optionalShackle=
-//                        Optional.ofNullable(player.getCapability(CapabilityHandler.SHACKLE_HANDLER));
-//                optionalShackle.ifPresent(shackle ->{
-//                    if(!shackle.hasShackle()){
-//                        Optional<CelestialEssence> optionalCE =
-//                                Optional.ofNullable(player.getCapability(CapabilityHandler.CELESTIAL_ESSENCE_HANDLER));
-//                        optionalCE.ifPresent(CE -> {
-//                            int tickCounter = tickCounters.getOrDefault(player, 0)+1;
-//                            if (tickCounter >= TICKS_PER_MINUTE) {
-//                                tickCounters.put(player, 0);
-//                                CE.addEtherealEssence(1);
-//                                player.sendSystemMessage(config.getMessage("online.reward",1));
-//                                if(CE.isReachShackle()){
-//                                    shackle.setShackle(true);
-//                                    shackle.setBreakRate(config.getInitialBreakRate(CE.getCultivationRealm(), CE.getStageRank()));
-//                                    shackle.setRatePerAdd(config.getBreakRatePerAdd(CE.getCultivationRealm(), CE.getStageRank()));
-//                                    CE.breakShackle();
-//                                }
-//                                PacketDistributor.PLAYER.with(player)
-//                                        .send(new CelestialEssenceData(CE.getCultivationRealm(), CE.getStageRank(), CE.getEtherealEssence()));
-//                            } else {
-//                                tickCounters.put(player, tickCounter);
-//                            }
-//                        });
-//                    }
-//                });
             }
         }
     }

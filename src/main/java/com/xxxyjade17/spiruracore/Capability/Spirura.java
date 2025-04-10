@@ -1,12 +1,15 @@
 package com.xxxyjade17.spiruracore.Capability;
 
+import com.xxxyjade17.spiruracore.Config;
 import net.minecraft.nbt.CompoundTag;
+
+import java.security.SecureRandom;
 
 public class Spirura implements ISpirura{
     private int rank;
     private int level;
     private int experience;
-    private boolean shackle;
+    private boolean shackle=false;
     private float breakRate;
     private float rateIncrease;
 
@@ -33,6 +36,21 @@ public class Spirura implements ISpirura{
     @Override
     public void addExperience(int experience) {
         this.experience+=experience;
+        int requiredExperience = Config.getINSTANCE().getRequiredExperience(rank, level);
+        if(this.experience>=requiredExperience){
+            if(Config.getINSTANCE().getShackle(rank,level)){
+                this.shackle=true;
+                this.breakRate = Config.getINSTANCE().getBreakRate(rank, level);
+                this.rateIncrease = Config.getINSTANCE().getRateIncrease(rank, level);
+            }else{
+                if(this.level!=10){
+                    this.level++;
+                }else{
+                    this.rank++;
+                    this.level=1;
+                }
+            }
+        }
     }
 
     @Override
@@ -47,7 +65,22 @@ public class Spirura implements ISpirura{
 
     @Override
     public void breakShackle() {
+        SecureRandom secureRandom = new SecureRandom();
+        float randomValue = secureRandom.nextFloat();
+        if(randomValue<=this.breakRate){
+            this.shackle=false;
+            this.breakRate = Config.getINSTANCE().getBreakRate(rank, level);
+            this.rateIncrease = Config.getINSTANCE().getRateIncrease(rank, level);
 
+            if(level==10){
+                rank++;
+                level=1;
+            }else{
+                level++;
+            }
+        }else{
+            this.breakRate+=this.rateIncrease;
+        }
     }
 
     @Override
